@@ -1,0 +1,41 @@
+name: Importar tema Shopify
+on:
+  push:
+    paths:
+      - 'bootstrap/payload.txt'
+permissions:
+  contents: write
+jobs:
+  importar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Descompactar projeto
+        run: |
+          python3 - <<'PY'
+          import base64, json, lzma
+          from pathlib import Path
+          payload = Path('bootstrap/payload.txt').read_text(encoding='ascii')
+          files = json.loads(lzma.decompress(base64.b85decode(payload)))
+          for name, content in files.items():
+              target = Path(name)
+              if target.is_absolute() or '..' in target.parts or target.parts[0] == 'bootstrap':
+                  raise ValueError(f'Unsafe path: {name}')
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_text(content, encoding='utf-8')
+          print(f'Imported {len(files)} files')
+          PY
+      - name: Validar projeto
+        run: |
+          npm test
+          npm run check:js
+      - name: Registrar tema no GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm bootstrap/payload.txt .github/workflows/import-theme.yml
+          git add -A
+          git commit -m "feat: adicionar tema Shopify Atelier Commerce v0.1.0"
+          git push
