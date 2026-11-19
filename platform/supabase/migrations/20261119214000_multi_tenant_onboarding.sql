@@ -123,11 +123,30 @@ begin
  if v_invite_id is null then
    raise exception 'Convite inexistente, expirado ou já utilizado';
  end if;
- update public.store_invitations set accepted_at = now() where id = v_invite_id;
  return new;
 end
 $$;
 revoke all on function app_private.verify_store_membership() from public;
+-- AFTER INSERT é obrigatório: políticas WITH CHECK são avaliadas após o BEFORE trigger.
+create or replace function app_private.mark_invite_accepted()
+returns trigger language plpgsql security definer
+set search_path = ''
+as $
+begin
+ if new.role = 'admin' then
+   update public.store_invitations
+   set accepted_at = now()
+   where store_id = new.store_id and role = new.role
+     and email = (select lower(email) from auth.users where id = new.user_id)
+     and accepted_at is null;
+ end if;
+ return new;
+end
+$;
+revoke all on function app_private.mark_invite_accepted() from public;
+create trigger mark_invitation_after_join
+after insert on public.store_members
+for each row execute function app_private.mark_invite_accepted();
 create trigger check_store_membership_before_insert
 before insert on public.store_members
 for each row execute function app_private.verify_store_membership();
@@ -161,9 +180,9 @@ create policy "members_join_with_invite" on public.store_members
    and role = 'admin'
    and exists (
      select 1 from public.store_invitations i
-     where i.store_id=store_id
+     where i.store_id=public.store_members.store_id
        and i.email=lower(coalesce((select auth.jwt())->>'email',''))
-       and i.role=role
+       and i.role=public.store_members.role
        and i.accepted_at is null
        and i.expires_at > now()
    )
