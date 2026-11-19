@@ -17,8 +17,11 @@ jobs:
           python3 - <<'PY'
           import base64, json, lzma
           from pathlib import Path
-          payload = Path('bootstrap/payload.txt').read_text(encoding='ascii')
+          chunks = sorted(Path('bootstrap').glob('part-*.txt'))
+          assert len(chunks) == 5, f'Esperados 5 blocos, encontrados {len(chunks)}'
+          payload = ''.join(f.read_text(encoding='ascii') for f in chunks)
           files = json.loads(lzma.decompress(base64.b85decode(payload)))
+          assert len(files) == 49, f'Esperados 49 arquivos, encontrados {len(files)}'
           for name, content in files.items():
               target = Path(name)
               if target.is_absolute() or '..' in target.parts or target.parts[0] == 'bootstrap':
@@ -35,7 +38,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm bootstrap/payload.txt .github/workflows/import-theme.yml
+          git rm -r bootstrap .github/workflows/import-theme.yml
           git add -A
           git commit -m "feat: adicionar tema Shopify Atelier Commerce v0.1.0"
           git push
