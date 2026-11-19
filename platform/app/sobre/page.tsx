@@ -1,0 +1,1 @@
+export default function About() { return <main className="shell page narrow"><span className="eyebrow">NOSSA HISTÓRIA</span><h1>Uma nova forma de comprar.</h1><p>Este espaço poderá receber a história, missão e valores da loja cadastrada. Os dados comerciais definitivos serão definidos pelo responsável pela operação.</p></main>; }

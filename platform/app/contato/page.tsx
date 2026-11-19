@@ -1,0 +1,1 @@
+export default function Contact() { return <main className="shell page narrow"><span className="eyebrow">FALE CONOSCO</span><h1>Contato</h1><p>Os canais oficiais de atendimento serão publicados aqui após o cadastro da loja. Não informamos telefones ou endereços não verificados.</p></main>; }
