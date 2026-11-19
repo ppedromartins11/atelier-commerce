@@ -8,6 +8,24 @@ A prévia estática do layout está hospedada na Vercel: **https://atelier-comme
 
 A Vercel publica apenas a pasta [`preview/`](preview/) deste repositório. O tema Shopify completo permanece nas pastas `sections/`, `templates/`, `layout/`, `snippets/`, `config/` e `assets/`. **A prévia não processa pedidos, não contém produtos cadastrados e não possui checkout funcional.** Para ativar vendas, é necessário instalar este tema em uma loja Shopify autorizada, configurar catálogo, frete e pagamentos e homologar os fluxos comerciais.
 
+## Plataforma SaaS própria — Sprint 2
+
+**A aplicação comercial independente está em [platform/](platform/).** Esta é a linha de desenvolvimento principal para vender a plataforma a diferentes empresas. O tema Shopify abaixo é mantido como legado/referência e não é necessário para a plataforma SaaS.
+
+- **Vitrine pública padrão:** https://atelier-commerce-platform.vercel.app/
+- **Acesso do lojista:** `/admin/login`; cadastro de conta `/admin/cadastro`
+- **Gerenciar empresas:** `/admin/lojas`; nova empresa `/admin/lojas/nova`
+- **Vitrine de cada empresa:** `/loja/<slug>`, com catálogo e carrinho separados
+- **Administração:** produtos, estoque, pedidos, fiscal, equipe e domínios
+- **Documentação das sprints:** [platform/docs/sprints.md](platform/docs/sprints.md)
+- **Infraestrutura:** Next.js + PostgreSQL/Supabase com RLS multi-tenant
+
+**Situação operacional:** o código da Sprint 2 está implementado e compilado no GitHub Actions, porém o banco Supabase exclusivo ainda não foi criado nem homologado. A Vercel também atingiu seu limite diário de deploys no momento da última tentativa de publicação; portanto, o endereço acima pode continuar mostrando a versão anterior. Não cadastre empresas ou ative vendas reais antes de aplicar e testar as migrações, configurar o Auth e homologar pagamentos/frete/fiscal.
+
+As solicitações de domínio ficam **pendentes** até a verificação DNS. Convites são **registrados** no banco, sem envio automático de e-mail. Nenhum produto, nota fiscal ou pagamento é simulado como real.
+
+---
+
 ## O que já foi desenvolvido
 
 - Homepage com banner configurável, seções de categorias, coleção em destaque, apresentação de marca e newsletter.
