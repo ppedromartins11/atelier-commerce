@@ -1,0 +1,47 @@
+name: Exportar Atelier Commerce para VS Code
+on:
+  push:
+    paths:
+      - '.github/workflows/export-vscode.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exportar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Preparar pasta do projeto
+        run: |
+          python3 - <<'PY'
+          import os, subprocess, shutil
+          from pathlib import Path
+          target = Path('export/atelier-commerce')
+          names = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')
+          count = 0
+          for name in names:
+              if not name:
+                  continue
+              path = Path(name)
+              if path.parts[0] in ('export', '.git') or not path.is_file():
+                  continue
+              if any(part in ('.next', 'node_modules', '__pycache__') for part in path.parts):
+                  continue
+              dest = target / path
+              dest.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(path, dest)
+              count += 1
+          print(f'Arquivos incluídos: {count}')
+          assert (target / 'platform/package.json').is_file()
+          assert (target / 'platform/supabase/migrations/20261119214000_multi_tenant_onboarding.sql').is_file()
+          assert (target / 'COMO-ABRIR-NO-VSCODE.md').is_file()
+          PY
+      - name: Publicar ZIP para download
+        uses: actions/upload-artifact@v4
+        with:
+          name: atelier-commerce-sprint2-vscode
+          path: export/
+          retention-days: 30
+          if-no-files-found: error
