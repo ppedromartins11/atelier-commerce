@@ -1,0 +1,4 @@
+<section class="section-spacing"><div class="container"><div class="page-heading"><span class="eyebrow">Explore a loja</span><h1>Coleções</h1></div>
+  {% paginate collections by 24 %}<div class="category-grid">{% for collection in collections %}<a href="{{ collection.url }}" class="category-tile">{% if collection.featured_image %}{{ collection.featured_image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '360,600,900', alt: collection.title }}{% endif %}<span class="category-overlay"></span><span class="category-content"><span>Categoria</span><strong>{{ collection.title | escape }}</strong><span class="category-arrow">↗</span></span></a>{% endfor %}</div>{% render 'pagination', paginate: paginate %}{% endpaginate %}
+</div></section>
+{% schema %}{"name":"Todas as coleções","settings":[]}{% endschema %}

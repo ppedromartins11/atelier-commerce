@@ -1,0 +1,22 @@
+{
+  "general": {
+    "search": "Search",
+    "cart": "Cart",
+    "menu": "Menu",
+    "close": "Close",
+    "view_all": "View all",
+    "empty": "No results found",
+    "sold_out": "Sold out",
+    "sale": "Sale",
+    "quantity": "Quantity",
+    "add_to_cart": "Add to cart",
+    "checkout": "Checkout",
+    "continue_shopping": "Continue shopping",
+    "shipping_at_checkout": "Shipping calculated at checkout"
+  },
+  "products": {
+    "filters": "Filters",
+    "sort": "Sort",
+    "details": "Product details"
+  }
+}

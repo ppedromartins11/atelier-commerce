@@ -1,0 +1,11 @@
+<section class="section-spacing standard-page"><div class="container narrow"><div class="page-heading"><span class="eyebrow">Atendimento</span><h1>{{ page.title | escape }}</h1></div>{% if page.content != blank %}<div class="rte">{{ page.content }}</div>{% endif %}
+  {% form 'contact', class: 'contact-form' %}
+    {% if form.posted_successfully? %}<p class="form-message" role="status">Mensagem enviada. Entraremos em contato pelo e-mail informado.</p>{% endif %}
+    {% if form.errors %}<div class="form-message form-message--error" role="alert">{{ form.errors | default_errors }}</div>{% endif %}
+    <label for="contact-name">Nome</label><input id="contact-name" name="contact[name]" autocomplete="name" value="{{ form.name | escape }}" required>
+    <label for="contact-email">E-mail</label><input id="contact-email" name="contact[email]" type="email" autocomplete="email" value="{{ form.email | escape }}" required>
+    <label for="contact-message">Mensagem</label><textarea id="contact-message" name="contact[body]" rows="6" required>{{ form.body | escape }}</textarea>
+    <button type="submit" class="button">Enviar mensagem {% render 'icon', name: 'arrow' %}</button>
+  {% endform %}
+</div></section>
+{% schema %}{"name":"Contato","settings":[]}{% endschema %}

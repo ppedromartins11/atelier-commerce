@@ -1,0 +1,22 @@
+{
+  "general": {
+    "search": "Buscar",
+    "cart": "Carrinho",
+    "menu": "Menu",
+    "close": "Fechar",
+    "view_all": "Ver todos",
+    "empty": "Nenhum resultado encontrado",
+    "sold_out": "Esgotado",
+    "sale": "Oferta",
+    "quantity": "Quantidade",
+    "add_to_cart": "Adicionar ao carrinho",
+    "checkout": "Finalizar compra",
+    "continue_shopping": "Continuar comprando",
+    "shipping_at_checkout": "Frete calculado na finalização da compra"
+  },
+  "products": {
+    "filters": "Filtros",
+    "sort": "Ordenar",
+    "details": "Detalhes do produto"
+  }
+}

@@ -1,0 +1,18 @@
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-about"><a class="footer-brand" href="{{ routes.root_url }}">{{ shop.name | escape }}<span>.</span></a><p>{{ section.settings.description | escape }}</p>
+      {% if settings.instagram_url != blank %}<a href="{{ settings.instagram_url | escape }}" target="_blank" rel="noopener noreferrer">Instagram ↗</a>{% endif %}
+    </div>
+    <div><h2>Institucional</h2><nav aria-label="Institucional">{% for link in section.settings.institutional_menu.links %}<a href="{{ link.url }}">{{ link.title | escape }}</a>{% endfor %}</nav></div>
+    <div><h2>Ajuda</h2><nav aria-label="Ajuda">{% for link in section.settings.help_menu.links %}<a href="{{ link.url }}">{{ link.title | escape }}</a>{% endfor %}</nav></div>
+    <div><h2>Fale com a gente</h2>
+      {% if shop.email != blank %}<a href="mailto:{{ shop.email | escape }}">{{ shop.email | escape }}</a>{% endif %}
+      {% if settings.whatsapp_number != blank %}<a href="https://wa.me/{{ settings.whatsapp_number | remove: '+' | remove: ' ' | escape }}" target="_blank" rel="noopener noreferrer">Atendimento por WhatsApp ↗</a>{% endif %}
+      <p>Compra segura e checkout protegido.</p>
+    </div>
+  </div>
+  <div class="container footer-bottom"><small>© {{ 'now' | date: '%Y' }} {{ shop.name | escape }}. Todos os direitos reservados.</small><small>Operado com Shopify.</small></div>
+</footer>
+{% schema %}
+{"name":"Rodapé","settings":[{"type":"textarea","id":"description","label":"Descrição","default":"Escolhas que acompanham seu estilo. Produtos selecionados para cada momento."},{"type":"link_list","id":"institutional_menu","label":"Menu institucional"},{"type":"link_list","id":"help_menu","label":"Menu de ajuda"}]}
+{% endschema %}

@@ -1,0 +1,38 @@
+<section class="section-spacing product-page"><div class="container">
+  <nav class="breadcrumbs" aria-label="Caminho"><a href="{{ routes.root_url }}">Início</a><span>/</span>{% if product.collections.first %}<a href="{{ product.collections.first.url }}">{{ product.collections.first.title | escape }}</a><span>/</span>{% endif %}<span aria-current="page">{{ product.title | escape }}</span></nav>
+  <div class="product-layout">
+    <div class="product-gallery" data-gallery>
+      <div class="product-main-image">
+        {% if product.featured_media != blank %}{{ product.featured_media.preview_image | image_url: width: 1600 | image_tag: loading: 'eager', widths: '540,900,1200,1600', sizes: '(min-width: 960px) 58vw, 100vw', alt: product.title, class: 'main-product-photo' }}{% else %}<span class="product-no-image">Imagem indisponível</span>{% endif %}
+      </div>
+      {% if product.media.size > 1 %}<div class="product-thumbnails" role="group" aria-label="Fotos do produto">{% for media in product.media %}
+        {% if media.media_type == 'image' %}<button type="button" class="thumbnail{% if media.id == product.featured_media.id %} is-active{% endif %}" data-gallery-thumb data-image-src="{{ media.preview_image | image_url: width: 1200 }}" data-image-alt="{{ media.alt | default: product.title | escape }}" aria-label="Ver imagem {{ forloop.index }}" aria-pressed="{% if media.id == product.featured_media.id %}true{% else %}false{% endif %}">{{ media.preview_image | image_url: width: 140 | image_tag: loading: 'lazy', widths: '70,140', alt: media.alt }}</button>{% endif %}
+      {% endfor %}</div>{% endif %}
+    </div>
+    <div class="product-details">
+      {% if product.vendor != blank %}<span class="eyebrow">{{ product.vendor | escape }}</span>{% endif %}
+      <h1>{{ product.title | escape }}</h1>
+      {% render 'price', product: product %}
+      {% if product.description != blank %}<div class="product-intro rte">{{ product.description }}</div>{% endif %}
+      {% form 'product', product, class: 'purchase-form' %}
+        {% unless product.has_only_default_variant %}
+          <label for="variant-{{ section.id }}">Escolha a opção</label>
+          <select id="variant-{{ section.id }}" name="id" data-variant-select required>
+            {% for variant in product.variants %}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>{{ variant.title | escape }}{% unless variant.available %} — Esgotado{% endunless %}</option>{% endfor %}
+          </select>
+        {% else %}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">{% endunless %}
+        <label for="quantity-{{ section.id }}">Quantidade</label>
+        <div class="quantity-control" data-quantity><button type="button" aria-label="Diminuir quantidade" data-quantity-decrement>{% render 'icon', name: 'minus' %}</button><input id="quantity-{{ section.id }}" name="quantity" type="number" min="1" value="1" inputmode="numeric"><button type="button" aria-label="Aumentar quantidade" data-quantity-increment>{% render 'icon', name: 'plus' %}</button></div>
+        <button type="submit" name="add" class="button button--wide" {% unless product.available %}disabled{% endunless %}>{% if product.available %}Adicionar ao carrinho{% else %}Produto esgotado{% endif %} {% render 'icon', name: 'arrow' %}</button>
+        {{ form | payment_button }}
+      {% endform %}
+      <script type="application/json" data-product-variants>{{ product.variants | json }}</script>
+      <p class="shipping-note">Frete e prazo calculados no checkout conforme endereço e opções disponíveis.</p>
+      {% if section.settings.shipping_message != blank %}<div class="service-note">{{ section.settings.shipping_message | escape }}</div>{% endif %}
+      {% if section.settings.details_page != blank %}<a href="{{ section.settings.details_page.url }}" class="text-link">{{ section.settings.details_page.title | escape }} ↗</a>{% endif %}
+    </div>
+  </div>
+</div></section>
+{% schema %}
+{"name":"Página de produto","settings":[{"type":"textarea","id":"shipping_message","label":"Informação complementar (não inserir promessas de frete não configuradas)"},{"type":"page","id":"details_page","label":"Página de trocas e devoluções"}]}
+{% endschema %}

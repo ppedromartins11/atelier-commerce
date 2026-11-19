@@ -1,0 +1,15 @@
+<section class="hero {% if section.settings.image != blank %}hero--image{% endif %}" id="shopify-section-hero-{{ section.id }}">
+  {% if section.settings.image != blank %}<div class="hero-image">{{ section.settings.image | image_url: width: 2200 | image_tag: loading: 'eager', widths: '800,1200,1600,2200', sizes: '100vw', alt: section.settings.image.alt | default: section.settings.title }}</div>{% endif %}
+  <div class="container hero-inner">
+    <div class="hero-content">
+      <span class="hero-kicker">{{ section.settings.kicker | escape }}</span>
+      <h1>{{ section.settings.title | escape | newline_to_br }}</h1>
+      {% if section.settings.description != blank %}<p>{{ section.settings.description | escape }}</p>{% endif %}
+      {% if section.settings.button_label != blank %}<a class="button button--light" href="{{ section.settings.button_link | default: routes.all_products_collection_url }}">{{ section.settings.button_label | escape }} {% render 'icon', name: 'arrow' %}</a>{% endif %}
+    </div>
+    <span class="hero-index">{{ section.settings.footnote | escape }}</span>
+  </div>
+</section>
+{% schema %}
+{"name":"Banner principal","settings":[{"type":"image_picker","id":"image","label":"Imagem de fundo"},{"type":"text","id":"kicker","label":"Etiqueta","default":"Nova temporada / Coleção 01"},{"type":"textarea","id":"title","label":"Título","default":"Seu estilo.\nSeu ritmo."},{"type":"textarea","id":"description","label":"Descrição","default":"Encontre peças que combinam com quem você é."},{"type":"text","id":"button_label","label":"Texto do botão","default":"Explorar coleção"},{"type":"url","id":"button_link","label":"Link do botão"},{"type":"text","id":"footnote","label":"Legenda inferior","default":"Escolha o que te representa"}],"presets":[{"name":"Banner principal"}]}
+{% endschema %}

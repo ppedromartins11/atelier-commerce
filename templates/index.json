@@ -1,0 +1,50 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {}
+    },
+    "categories": {
+      "type": "collection-highlights",
+      "settings": {},
+      "blocks": {
+        "first": {
+          "type": "category",
+          "settings": {}
+        },
+        "second": {
+          "type": "category",
+          "settings": {}
+        },
+        "third": {
+          "type": "category",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "first",
+        "second",
+        "third"
+      ]
+    },
+    "featured": {
+      "type": "featured-collection",
+      "settings": {}
+    },
+    "story": {
+      "type": "brand-story",
+      "settings": {}
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {}
+    }
+  },
+  "order": [
+    "hero",
+    "categories",
+    "featured",
+    "story",
+    "newsletter"
+  ]
+}
