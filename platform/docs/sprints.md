@@ -1,7 +1,7 @@
 # Roadmap de sprints — Atelier Commerce SaaS
 
 ## Visão geral
-O produto contém duas interfaces separadas: **loja pública** para os consumidores e **painel administrativo** para cada empresa. O código do tema Shopify legado continua na raiz do repositório; a plataforma Next.js vive em `platform/`.
+O produto contém duas interfaces separadas: **loja pública** para os consumidores e **painel administrativo** para cada empresa. A plataforma Next.js vive em `platform/`; a prévia visual independente está em `preview/`. O tema Shopify anterior pode ser recuperado pelo histórico Git.
 
 | Sprint | Escopo | Critério de aceite |
 |---|---|---|
@@ -41,10 +41,20 @@ Não são usados produtos ou pedidos inventados. A foto do banner é um recurso 
 - [x] Acesso de administradores restrito à loja vinculada, com políticas de isolamento
 - [x] Vitrines isoladas em `/loja/[tenant]`, incluindo catálogo e carrinho com chaves distintas
 - [x] Solicitações de domínio sem DNS ou ativação automáticos
-- [x] Testes estáticos de isolamento e compilação automatizada
+- [x] Testes estáticos de políticas e rotas, além de compilação automatizada; não comprovam isolamento real
 - [ ] Provisionar banco Supabase exclusivo: a conta exige confirmação de custo, mesmo com estimativa de US$ 0/mês
 - [ ] Aplicar migrações, testar política RLS com usuários reais de lojas diferentes
 - [ ] Configurar e testar template de confirmação de e-mail e fluxo de convite
 - [ ] Homologar operações em uma instância de produção antes de vender
 
 **A plataforma ainda não está habilitada para lojas reais.** O código-fonte e telas não substituem o provisionamento e a homologação do banco de dados.
+
+### Sprint 3 — catálogo profissional (iniciada)
+- [x] Cadastro inicial de produto, variante padrão e histórico de estoque em uma RPC transacional, preparado em migração ainda não aplicada
+- [x] Busca e categorias por vitrine, com slug de tenant aplicado à consulta de categorias
+- [ ] Testar a RPC, os grants e o isolamento entre lojas em Supabase dedicado
+- [ ] Edição e exclusão segura de produtos; categorias e subcategorias completas
+- [ ] Imagens em Storage com permissões; variantes, SKU e código de barras completos
+- [ ] Importação CSV, filtros, disponibilidade e publicação homologada
+
+O fluxo de catálogo continua parcial até o teste no banco e a conclusão das operações de edição e mídia.

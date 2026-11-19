@@ -1,99 +1,75 @@
-# Atelier Commerce — Tema Shopify 2.0
+# Atelier Commerce
 
-**Tema original e reutilizável** para lojas virtuais de tênis, roupas, acessórios e outros segmentos. Desenvolvido com **Liquid, HTML, CSS e JavaScript**, usando o catálogo, carrinho e checkout nativos da Shopify. O projeto usa **Xo Gang Brazil apenas como referência funcional**, sem copiar identidade visual, código privado ou conteúdos da marca.
+Plataforma própria de comércio eletrônico para diferentes empresas. O produto está em desenvolvimento; **não está homologado para uso comercial**. O código da aplicação Next.js vive em [`platform/`](platform/). A pasta [`preview/`](preview/) conserva apenas a referência visual editorial e não vende produtos.
 
-## Prévia visual publicada
+## Estado atual
 
-A prévia estática do layout está hospedada na Vercel: **https://atelier-commerce-iota.vercel.app/**.
+| Área | Estado verificável |
+|---|---|
+| Vitrine e catálogo por loja | Código implementado; depende de banco dedicado e produtos reais |
+| Cadastro de conta, empresa, equipe e domínios | Código implementado; Auth e RLS ainda não homologados em banco dedicado |
+| Categorias, cadastro inicial de produto e estoque | Código implementado, inclusive RPC transacional para produto; sem teste de integração no banco |
+| Carrinho | Armazenamento local por loja; não cria pedidos |
+| Pedidos e documentos fiscais | Leitura administrativa de tabelas; criação e emissão desabilitadas |
+| Pagamentos, frete, assinaturas e checkout | Não desenvolvidos |
 
-A Vercel publica apenas a pasta [`preview/`](preview/) deste repositório. O tema Shopify completo permanece nas pastas `sections/`, `templates/`, `layout/`, `snippets/`, `config/` e `assets/`. **A prévia não processa pedidos, não contém produtos cadastrados e não possui checkout funcional.** Para ativar vendas, é necessário instalar este tema em uma loja Shopify autorizada, configurar catálogo, frete e pagamentos e homologar os fluxos comerciais.
+Nenhuma tela representa transações, notas ou produtos fictícios como dados reais. Publicar a vitrine não ativa a finalização de compras.
 
-## Plataforma SaaS própria — Sprint 2
+## Executar localmente
 
-**A aplicação comercial independente está em [platform/](platform/).** Esta é a linha de desenvolvimento principal para vender a plataforma a diferentes empresas. O tema Shopify abaixo é mantido como legado/referência e não é necessário para a plataforma SaaS.
+Requer Node.js 22 ou superior e npm. No terminal do VS Code:
 
-- **Vitrine pública padrão:** https://atelier-commerce-platform.vercel.app/
-- **Acesso do lojista:** `/admin/login`; cadastro de conta `/admin/cadastro`
-- **Gerenciar empresas:** `/admin/lojas`; nova empresa `/admin/lojas/nova`
-- **Vitrine de cada empresa:** `/loja/<slug>`, com catálogo e carrinho separados
-- **Administração:** produtos, estoque, pedidos, fiscal, equipe e domínios
-- **Documentação das sprints:** [platform/docs/sprints.md](platform/docs/sprints.md)
-- **Infraestrutura:** Next.js + PostgreSQL/Supabase com RLS multi-tenant
+```powershell
+cd platform
+npm.cmd ci
+Copy-Item .env.example .env.local
+npm.cmd run dev
+```
 
-**Situação operacional:** o código da Sprint 2 está implementado e compilado no GitHub Actions, porém o banco Supabase exclusivo ainda não foi criado nem homologado. A Vercel também atingiu seu limite diário de deploys no momento da última tentativa de publicação; portanto, o endereço acima pode continuar mostrando a versão anterior. Não cadastre empresas ou ative vendas reais antes de aplicar e testar as migrações, configurar o Auth e homologar pagamentos/frete/fiscal.
+Abra `http://localhost:3000`. Sem variáveis Supabase configuradas, a vitrine exibe estado vazio e o cadastro fica indisponível. Use somente um projeto Supabase **dedicado** ao Atelier Commerce para testar Auth e dados. Não reutilize credenciais ou bancos de outras aplicações.
 
-As solicitações de domínio ficam **pendentes** até a verificação DNS. Convites são **registrados** no banco, sem envio automático de e-mail. Nenhum produto, nota fiscal ou pagamento é simulado como real.
+Em `platform/.env.local`, preencha:
 
----
+| Variável | Uso |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase dedicado |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Chave publicável do mesmo projeto |
+| `NEXT_PUBLIC_SITE_URL` | Origem do site para confirmação de e-mail; localmente `http://localhost:3000` |
+| `STORE_SLUG` | Slug da vitrine padrão em `/`; as demais usam `/loja/<slug>` |
 
-## O que já foi desenvolvido
+Não coloque chaves secretas em variáveis `NEXT_PUBLIC_`. Configure no Supabase o URL do site, os redirecionamentos permitidos e o template de confirmação para `/auth/confirm` antes de testar cadastro. A aplicação espera `token_hash` e `type` nessa rota.
 
-- Homepage com banner configurável, seções de categorias, coleção em destaque, apresentação de marca e newsletter.
-- Menu desktop/mobile com navegação por categorias da loja.
-- Vitrine real de produtos da Shopify (imagens, valores, disponibilidade e preço promocional).
-- Coleções com ordenação, filtros nativos do catálogo e paginação.
-- Página de produto com imagens, variantes, quantidade, compra e pagamento acelerado (conforme configuração da loja).
-- Carrinho com alteração de quantidades, remoção, descontos aplicados e botão de checkout nativo.
-- Busca, páginas institucionais, contato, blog, artigo, 404 e lista de coleções.
-- Cores, logotipo, menus, banners, coleções e textos configuráveis no editor do tema.
-- Layout responsivo, landmarks semânticos, foco visível e preferência de movimento reduzido.
-- Testes automatizados de estrutura e consistência de templates e schemas.
+## Banco e testes
 
-> **Estado da entrega:** versão inicial de desenvolvimento, não homologada para comercialização. Sem credenciais de uma loja Shopify, não é possível confirmar renderização Liquid, disponibilidade de produto, frete, pagamentos, filtros e checkout em ambiente real. A loja será publicada somente após esses testes.
+As migrações em [`platform/supabase/migrations/`](platform/supabase/migrations/) devem ser aplicadas **em ordem** somente em um banco dedicado e autorizado. As migrações históricas são mantidas. A última corrige a atualização de lojas pelo proprietário e cadastra produto, variante e estoque inicial em uma transação. Como não havia banco local conectado nesta auditoria, sua execução e o isolamento real entre Loja A e Loja B seguem pendentes.
+
+```powershell
+cd platform
+npm.cmd test
+npx.cmd tsc --noEmit
+npm.cmd run build
+```
+
+O projeto não tem comando de lint configurado. Os testes atuais incluem verificações estáticas e uma regra unitária de preço; **não provam** Auth, RLS, persistência nem comportamento no navegador.
 
 ## Organização
 
 ```text
-assets/              CSS e JS
-config/              Configurações e cores
-layout/              Estrutura HTML principal
-locales/             Idiomas
-sections/            Seções e páginas comerciais
-snippets/            Componentes reutilizáveis
-templates/           Mapeamento das páginas JSON
-tests/               Testes automatizados
-docs/                Guias de implantação e checklist
-.github/workflows/   Validação básica a cada push
+platform/
+  app/                 Vitrine, painel, Auth e rotas
+  components/          Componentes compartilhados de interface
+  lib/                 Acesso Supabase, catálogo e formatação
+  supabase/migrations/  Esquema e evolução do banco
+  tests/               Testes locais
+  docs/                Arquitetura e roadmap
+preview/               Referência visual estática
+.github/workflows/      Build, testes e exportação
 ```
 
-## Pré-requisitos
+O tema Shopify anterior foi removido da árvore de trabalho. Pode ser recuperado pelo commit `b5e70d7` do histórico Git ou pela tag local `pre-saas-cleanup-2026-11-19`.
 
-1. Node.js 20 ou superior.
-2. Shopify CLI, instalada com `npm install -g @shopify/cli@latest`.
-3. Conta de desenvolvedor Shopify e loja de desenvolvimento (ou acesso autorizado a uma loja existente).
-4. Produtos e coleções **reais** cadastrados na loja. Não são enviados produtos fictícios.
+## Próximos passos e publicação
 
-## Rodar e testar
+Veja o [roadmap](platform/docs/sprints.md), a [arquitetura](platform/docs/arquitetura.md) e a [auditoria de 19/11/2026](AUDITORIA.md). A próxima validação exige banco de desenvolvimento dedicado, aplicação controlada das migrações e teste cruzado com duas lojas e usuários distintos. Depois, concluir edição e publicação de catálogo antes de checkout, pagamentos ou operação fiscal.
 
-```bash
-npm test
-npm run check:js
-shopify theme check
-shopify theme dev --store nome-da-loja.myshopify.com
-```
-
-Abra a URL de preview fornecida pela Shopify CLI. No editor de temas, selecione coleções nos blocos de categorias e na vitrine, defina menus, configure logo e banner. Para manter descontos, frete, políticas e preços coerentes, gerencie essas regras no administrador Shopify.
-
-**Importante:** `shopify theme dev` requer login/autorização na loja. Para enviar sem tornar público, utilize `shopify theme push --unpublished --store nome-da-loja.myshopify.com`. A publicação da loja envolve ativar um tema e conferir checkout, pagamentos e impostos, não apenas publicar o repositório GitHub.
-
-## Pagamentos
-
-O código apresenta a compra pelo formulário Shopify e direciona para o checkout nativo. **Não cria nem processa cartões, Pix ou dados bancários.** Configure um provedor de pagamento compatível na administração da loja e teste as transações na modalidade de teste homologada por ele antes de vender. Não declare valores parcelados ou descontos Pix fixos sem regras efetivamente configuradas.
-
-## Adaptação por segmento
-
-Personalize cores e componentes nas configurações do tema e configure produtos/coleções reais. Se o cliente precisar de recursos específicos (ex.: grade de tamanhos, kits, comparador de produtos), desenvolva seções independentes sem alterar o fluxo central de pedidos. Cada cliente utiliza sua própria instância Shopify; o tema pode compartilhar o mesmo código-fonte base.
-
-## Licença e autoria
-
-Código autoral gerado para este projeto; não distribui recursos proprietários de Xo Gang Brazil ou Aloft Agência. Consulte as licenças dos aplicativos, fotografias, fontes, vídeos e conteúdos adicionados futuramente. Este projeto não está associado a essas marcas.
-
-## Publicar no GitHub
-
-Na pasta raiz do projeto, com [GitHub CLI](https://cli.github.com/) autenticada (`gh auth login`), execute:
-
-```bash
-bash scripts/publicar-github.sh
-```
-
-O script cria o repositório público `ppedromartins11/atelier-commerce` na sua conta caso ainda não exista, ou envia a branch `main` caso já exista. Não publica automaticamente o tema como loja online.
+Para publicar a aplicação, configure a raiz do projeto de hospedagem como `platform/`, instale com `npm ci` e use `npm run build`. Configure as variáveis no ambiente correspondente e homologue Auth, RLS e dados reais antes de promover qualquer versão a clientes. A prévia em `preview/` é independente e não deve ser usada como evidência da versão da plataforma.

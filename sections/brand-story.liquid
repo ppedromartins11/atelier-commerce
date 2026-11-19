@@ -1,7 +1,0 @@
-<section class="brand-story section-spacing"><div class="container brand-story-grid">
-  <div class="brand-story-media">{% if section.settings.image != blank %}{{ section.settings.image | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '480,780,1200', sizes: '(min-width: 760px) 50vw, 100vw' }}{% else %}<div class="brand-story-art" aria-hidden="true"><span>EST.</span><strong>STYLE<br>FIRST.</strong></div>{% endif %}</div>
-  <div class="brand-story-copy"><span class="eyebrow">{{ section.settings.kicker | escape }}</span><h2>{{ section.settings.heading | escape }}</h2><p>{{ section.settings.description | escape }}</p>{% if section.settings.button_label != blank %}<a href="{{ section.settings.button_link | default: routes.all_products_collection_url }}" class="text-link">{{ section.settings.button_label | escape }} {% render 'icon', name: 'arrow' %}</a>{% endif %}</div>
-</div></section>
-{% schema %}
-{"name":"Nossa essência","settings":[{"type":"image_picker","id":"image","label":"Imagem"},{"type":"text","id":"kicker","label":"Etiqueta","default":"Nossa essência"},{"type":"text","id":"heading","label":"Título","default":"Mais que tendência, expressão."},{"type":"textarea","id":"description","label":"Descrição","default":"Cada escolha diz algo sobre você. Reunimos peças para quem gosta de fazer do próprio estilo uma assinatura."},{"type":"text","id":"button_label","label":"Botão","default":"Conheça a coleção"},{"type":"url","id":"button_link","label":"Link"}],"presets":[{"name":"Nossa essência"}]}
-{% endschema %}

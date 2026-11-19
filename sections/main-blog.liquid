@@ -1,4 +1,0 @@
-<section class="section-spacing standard-page"><div class="container"><div class="page-heading"><span class="eyebrow">Editorial</span><h1>{{ blog.title | escape }}</h1></div>{% paginate blog.articles by 12 %}
-  <div class="editorial-grid">{% for article in blog.articles %}<article class="editorial-card"><a href="{{ article.url }}">{% if article.image %}{{ article.image | image_url: width: 800 | image_tag: loading: 'lazy', widths: '360,600,800', alt: article.title }}{% endif %}<span class="eyebrow">{{ article.published_at | date: '%d/%m/%Y' }}</span><h2>{{ article.title | escape }}</h2></a><p>{{ article.excerpt_or_content | strip_html | truncate: 125 }}</p></article>{% endfor %}</div>{% render 'pagination', paginate: paginate %}{% endpaginate %}
-</div></section>
-{% schema %}{"name":"Blog","settings":[]}{% endschema %}

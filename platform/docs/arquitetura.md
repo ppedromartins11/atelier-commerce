@@ -1,50 +1,21 @@
-# Atelier Commerce — plataforma própria
+# Arquitetura da plataforma
 
-## Objetivo
+## Aplicação
 
-Plataforma de e-commerce brasileira reutilizável, sem dependência da Shopify. A primeira entrega contém site público, autenticação de administração, catálogo e variantes, movimentações de estoque registradas, telas administrativas de pedidos e notas fiscais e modelo de dados multi-loja.
+`app/(store)/` é a vitrine padrão, resolvida por `STORE_SLUG`. `app/loja/[tenant]/` resolve a loja pelo slug da URL. As duas usam componentes de `components/` e consultas de `lib/catalog.ts`; a loja precisa estar publicada para aparecer ao público. `app/admin/` contém o painel e as Server Actions. `lib/supabase.ts` cria o cliente público e o cliente de sessão, consulta o usuário com `auth.getUser()` e escolhe a loja ativa entre as associações reais desse usuário. O cookie de seleção é apenas preferência.
 
-## Módulos
+O painel usa `store_id` em cada consulta e operação. As tabelas operacionais têm `store_id`, chaves estrangeiras compostas quando relacionam dados de loja e políticas RLS. A autorização final precisa ocorrer no banco: parâmetros de URL, formulários e cookies não são fontes de permissão. As migrações ficam em `supabase/migrations/` e são aplicadas em ordem; as duas iniciais permanecem como histórico.
 
-| Módulo | Estado |
-|---|---|
-| Catálogo público e busca | Implementado (dados reais após banco) |
-| Administração e autenticação | Implementado (Supabase Auth + RLS; requer provisionamento) |
-| Produtos, categorias, variações e SKU | Cadastro inicial; evolução de grade complexa pendente |
-| Estoque | Ajuste atômico + registro de histórico |
-| Carrinho | Persistência local; sem pedido confirmado |
-| Pedidos | Estrutura e leitura administrativa; criação por checkout pendente |
-| Pagamentos | Schema; integração e webhook pendentes |
-| Frete | Schema; cotação e transportadoras pendentes |
-| Emissão de NF-e / NFC-e | Schema; autorização fiscal real pendente |
-| Clientes / LGPD | Não iniciado; requer políticas de dados e consentimento |
-| Multi-loja | Isolamento por store_id, permissões por membro; painel único por STORE_SLUG |
+## Permissões atuais
 
-## Segurança
+Um usuário pode pertencer a mais de uma loja. `owner` administra a identidade, publicação, equipe e solicitações de domínio; `admin` pode gerenciar catálogo e estoque. A migração mais recente remove a política antiga que permitia ao `admin` alterar a própria loja. O cadastro inicial de produto e o ajuste de estoque passam por funções em `app_private` com checagem de associação à loja, chamadas por RPCs públicas restritas a `authenticated`. Produtos, variantes e movimentações iniciais são gravados na mesma transação. A Data API não recebe escrita direta nessas tabelas sensíveis após a nova migração.
 
-- Permissões por loja na Row Level Security. O usuário autenticado não se torna administrador automaticamente.
-- Colunas comerciais sensíveis e pedidos somente são legíveis para usuários administradores da loja.
-- Não há escrita pública de pedido, pagamento, estoque ou notas fiscais.
-- Estoque tem restrições e movimentações atômicas; nunca confiar no preço armazenado no carrinho.
-- Integrações fiscais precisam de CNPJ/IE, regime tributário, certificado e provedor homologado. Guardar credenciais e certificados apenas em serviços secretos, nunca em variáveis NEXT_PUBLIC, commits ou tabelas expostas.
-- Pagamento exige verificação criptográfica de webhook, reconciliação e idempotência por pedido; confirmação nunca deve depender apenas do navegador.
+Convites são registros no banco, sem envio automático. A aceitação exige e-mail confirmado e é conferida por trigger. Domínios são propostas pendentes; a tabela não oferece atualização pública de `verified_at`. Não há políticas públicas para criar pedidos, registrar pagamentos ou emitir documentos fiscais.
 
-## Ativação
+## Limites e homologação obrigatória
 
-1. Criar um projeto Supabase **dedicado** a este sistema.
-2. Aplicar a migração SQL em um ambiente controlado e executar os advisors de segurança.
-3. Criar usuário administrador no Supabase Auth; associá-lo a uma loja pelo SQL abaixo com UUID explícito obtido no painel.
-4. Configurar NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY e STORE_SLUG na hospedagem.
-5. Validar o fluxo cadastro → estoque → publicação → vitrine antes de iniciar meios de pagamento.
+As políticas e funções foram revisadas no código, mas **não foram aplicadas nem executadas em um banco dedicado nesta auditoria**. Antes de cadastrar empresas reais, é obrigatório aplicar as migrações em ambiente isolado, rodar os advisors, confirmar grants e exercitar consultas e mutações com dois usuários de lojas diferentes. O teste deve trocar `store_id`, cookie, slug e identificadores nas RPCs; todas as tentativas de leitura ou escrita cruzada devem ser negadas. Teste também proprietário versus administrador, convite expirado, revogação, criação parcial de produto e concorrência no estoque.
 
-Exemplo de provisionamento (substitua o UUID; execute com um administrador do banco, **nunca no navegador**):
+`orders`, `payments`, `fiscal_documents` e `shipping_methods` são apenas estruturas para evolução. O carrinho fica no armazenamento local do navegador e não é cotação, reserva ou pedido. A confirmação de pagamento dependerá de provedor real, webhook autenticado, idempotência e reconciliação. A operação fiscal dependerá de integração e homologação próprias.
 
-```sql
-insert into public.stores (slug,name,hero_title,is_published) values ('atelier','Atelier Commerce','Uma nova coleção está chegando',true);
-insert into public.store_members (store_id,user_id,role)
-select id, 'UUID_DO_USUARIO_AUTH'::uuid, 'owner' from public.stores where slug='atelier';
-```
-
-## Separação do projeto
-
-A pasta original do tema Shopify foi preservada. O frontend estático continua em preview/. A nova plataforma é independente em platform/ e terá hospedagem própria; não redirecione o domínio comercial até homologação.
+O [README principal](../../README.md) contém instalação, variáveis, testes e publicação. O [roadmap](sprints.md) registra a ordem de evolução.

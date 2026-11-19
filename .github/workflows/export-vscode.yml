@@ -36,12 +36,13 @@ jobs:
           print(f'Arquivos incluídos: {count}')
           assert (target / 'platform/package.json').is_file()
           assert (target / 'platform/supabase/migrations/20261119214000_multi_tenant_onboarding.sql').is_file()
-          assert (target / 'COMO-ABRIR-NO-VSCODE.md').is_file()
+          assert (target / 'platform/supabase/migrations/20261119224437_secure_store_updates_and_atomic_product_creation.sql').is_file()
+          assert (target / 'README.md').is_file()
           PY
       - name: Publicar ZIP para download
         uses: actions/upload-artifact@v4
         with:
-          name: atelier-commerce-sprint2-vscode
+          name: atelier-commerce-vscode
           path: export/
           retention-days: 30
           if-no-files-found: error
