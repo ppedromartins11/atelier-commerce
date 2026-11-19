@@ -23,6 +23,8 @@ jobs:
           files = json.loads(lzma.decompress(base64.b85decode(payload)))
           assert len(files) == 49, f'Esperados 49 arquivos, encontrados {len(files)}'
           for name, content in files.items():
+              if name.startswith('.github/workflows/'):
+                  continue
               target = Path(name)
               if target.is_absolute() or '..' in target.parts or target.parts[0] == 'bootstrap':
                   raise ValueError(f'Unsafe path: {name}')
@@ -38,7 +40,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm -r bootstrap .github/workflows/import-theme.yml
+          git rm -r bootstrap
           git add -A
           git commit -m "feat: adicionar tema Shopify Atelier Commerce v0.1.0"
           git push
