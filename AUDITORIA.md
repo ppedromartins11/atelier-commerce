@@ -51,6 +51,8 @@ atelier-commerce/
 
 Na pasta `platform/`: `npm ci --no-audit --no-fund` instalou 37 pacotes; `npm test` aprovou 21 testes; `npx tsc --noEmit` e `npm run build` passaram. O projeto não configura lint. Os testes de RLS existentes verificam texto de políticas e rotas; **não simulam dois usuários nem provam isolamento real**. No Chromium local, a homepage, o catálogo vazio e o login abriram em 390 px; a homepage também abriu em 1280 px. Não houve rolagem horizontal nessas telas, e o menu móvel abriu com seus links. Isso não valida todas as páginas nem estados com dados reais. Não havia `.env.local`, PostgreSQL local, daemon Docker ou projeto Supabase dedicado autorizado. Por isso a migração mais recente, fluxos de Auth, persistência, concorrência e deploy não foram homologados. Nenhuma migração remota nem publicação foi executada.
 
+Consulta remota somente de leitura em 19/11/2026: a conexão Supabase disponível não lista projeto dedicado ao Atelier Commerce. Os dois projetos Vercel, `atelier-commerce` (prévia) e `atelier-commerce-platform` (Next.js), mostram como último deployment de produção pronto o commit `b5e70d7`, anterior aos commits locais desta auditoria. Portanto, as páginas públicas ainda não contêm as correções descritas aqui. Nenhuma configuração ou deployment remoto foi alterado.
+
 ## Próxima sprint verificável
 
 1. Provisionar um banco **dedicado e autorizado**, aplicar as três migrações e rodar advisors. Confirmar comportamento de grants, funções e triggers.
