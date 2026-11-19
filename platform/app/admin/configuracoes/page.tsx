@@ -5,6 +5,7 @@ import {updateSettings} from '@/app/admin/actions';
 export const dynamic='force-dynamic';
 export default async function Settings({searchParams}:{searchParams:Promise<{erro?:string;salvo?:string}>}){
  const a=await requireAdmin();if(!a)redirect('/admin/login');
+ if(a.role!=='owner')redirect('/admin');
  const {data:s}=await a.db.from('stores').select('name,description,hero_title,hero_text,hero_image_url').eq('id',a.shop.id).single();
  const params=await searchParams;
  return <AdminNav><div className="admin-title"><div><span className="eyebrow">SUA MARCA</span><h1>Personalização</h1><p>Ajuste textos e identidade visual da vitrine.</p></div></div>

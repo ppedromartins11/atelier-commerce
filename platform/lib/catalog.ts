@@ -16,7 +16,7 @@ export async function catalog(search?: string, category?: string, tenantSlug?: s
   return { shop, products: (data || []) as Item[] };
 }
 export async function categories(tenantSlug?:string) {
-  const shop = await store();
+  const shop = await store(tenantSlug);
   const db = publicClient();
   if (!shop || !db) return [];
   const { data } = await db.from('categories').select('id,name,slug').eq('store_id',shop.id).order('sort_order');

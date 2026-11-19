@@ -3,11 +3,11 @@ import {registerAccount} from '@/app/admin/onboarding-actions';
 export const dynamic='force-dynamic';
 export default async function Register({searchParams}:{searchParams:Promise<{erro?:string;status?:string}>}){
  const q=await searchParams;
- const ready=Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL&&process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+ const ready=Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL&&process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY&&process.env.NEXT_PUBLIC_SITE_URL);
  return <main className="shell login-wrap"><span className="eyebrow">CRIE SUA CONTA</span>
   <h1>Sua loja começa aqui.</h1>
   <p className="help-text">Depois de confirmar seu e-mail, você poderá cadastrar uma ou mais empresas e administrar cada uma separadamente.</p>
-  {!ready&&<p className="notice">O cadastro será liberado após a conexão do banco de dados dedicado.</p>}
+  {!ready&&<p className="notice">O cadastro será liberado após configurar o banco dedicado e o endereço de confirmação de e-mail.</p>}
   {q.erro&&<p className="alert">{q.erro}</p>}
   {q.status==='confirmar'&&<p className="notice">Conta registrada. Confira seu e-mail e confirme o cadastro antes de acessar o painel.</p>}
   <div className="panel"><form action={registerAccount}>

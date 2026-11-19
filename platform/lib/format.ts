@@ -6,11 +6,13 @@ export function slugify(value: string): string {
 }
 export function priceToCents(value: string): number {
   const number = Number(value.replace(',', '.'));
-  if (!Number.isFinite(number) || number < 0 || number > 99999999) throw new Error('Preço inválido.');
-  return Math.round(number * 100);
+  const cents = Math.round(number * 100);
+  if (!value.trim() || !Number.isFinite(number) || number < 0 || !Number.isSafeInteger(cents) || cents > 2147483647)
+    throw new Error('Preço inválido.');
+  return cents;
 }
 export function nonNegativeInt(value: string, label: string): number {
   const n = Number(value);
-  if (!Number.isSafeInteger(n) || n < 0) throw new Error(label + ' deve ser inteiro e não negativo.');
+  if (!value.trim() || !Number.isSafeInteger(n) || n < 0) throw new Error(label + ' deve ser inteiro e não negativo.');
   return n;
 }

@@ -47,26 +47,21 @@ export async function createProduct(form:FormData){
   if(image && (!image.startsWith('https://')||image.length>2000))fail('Informe uma URL HTTPS de imagem.');
   let price:number,stock:number;
   try{price=priceToCents(read(form,'price'));stock=nonNegativeInt(read(form,'stock'),'Estoque');}catch(e){fail((e as Error).message);}
+  if(stock>500000)fail('Estoque inicial deve ser de até 500.000 unidades.');
   const slug=slugify(title);
+  if(slug.length<3)fail('Informe um nome de produto com letras ou números suficientes.');
   const category=read(form,'category_id')||null;
-  const {data:product,error}=await db.from('products').insert({
-    store_id:shop.id,title,slug,description:read(form,'description').slice(0,5000),
-    images:image?[image]:[],price_cents:price,category_id:category,active:form.get('active')==='on'
-  }).select('id').single();
-  if(error||!product)fail('Não foi possível criar o produto: '+(error?.message||'erro desconhecido'));
-  const {data:variant,error:variantError}=await db.from('product_variants').insert({
-    store_id:shop.id,product_id:product.id,sku,label:'Padrão',stock_on_hand:stock
-  }).select('id').single();
-  if(variantError||!variant){
-    await db.from('products').delete().eq('id',product.id).eq('store_id',shop.id);
-    fail('Não foi possível cadastrar SKU/estoque: '+(variantError?.message||'erro desconhecido'));
-  }
-  if(stock>0){
-    const {error:movementError}=await db.from('stock_movements').insert({
-      store_id:shop.id,variant_id:variant.id,delta:stock,reason:'Estoque inicial do produto',actor_user_id:(await db.auth.getUser()).data.user?.id
-    });
-    if(movementError)fail('Produto criado, mas histórico de estoque inicial indisponível: '+movementError.message);
-  }
+  const {error}=await db.rpc('create_product_with_initial_stock',{
+    p_store_id:shop.id,p_title:title,p_slug:slug,
+    p_description:read(form,'description').slice(0,5000),p_image_url:image||null,
+    p_price_cents:price,p_category_id:category,p_sku:sku,p_stock:stock,
+    p_active:form.get('active')==='on'
+  });
+  if(error)fail(error.code==='23505'
+    ?'Já existe um produto com esse nome ou SKU nesta loja.'
+    :error.code==='23503'
+      ?'A categoria selecionada não pertence a esta loja ou foi removida.'
+      :'Cadastro indisponível. Verifique os dados, a conexão e a migração de catálogo.');
   revalidatePath('/');
   revalidatePath('/catalogo');
   revalidatePath('/admin');
@@ -95,7 +90,8 @@ export async function adjustStock(form:FormData){
   redirect('/admin/estoque');
 }
 export async function updateSettings(form:FormData){
-  const {db,shop}=await access();
+  const {db,shop,role}=await access();
+  if(role!=='owner')fail('Somente o proprietário pode alterar a identidade da loja.','/admin/lojas');
   const name=read(form,'name').slice(0,160);
   if(name.length<2)fail('Nome inválido.','/admin/configuracoes');
   const hero_image_url=read(form,'hero_image_url');

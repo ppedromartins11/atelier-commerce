@@ -16,7 +16,9 @@ export async function registerAccount(data:FormData){
   const password=field(data,'password');
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254)problem('/admin/cadastro','Informe um e-mail válido.');
   if(password.length<12||password.length>72)problem('/admin/cadastro','Use uma senha entre 12 e 72 caracteres.');
-  const origin=(process.env.NEXT_PUBLIC_SITE_URL||'https://atelier-commerce-platform.vercel.app').replace(/\/$/,'');
+  const origin=process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/,'');
+  if(!origin || !/^https?:\/\/[^/]+$/.test(origin))
+    problem('/admin/cadastro','Endereço do site não configurado para confirmação de e-mail.');
   const {data:result,error}=await db.auth.signUp({
     email,password,
     options:{emailRedirectTo:origin+'/auth/confirm'}

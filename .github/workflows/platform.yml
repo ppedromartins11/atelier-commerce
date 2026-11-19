@@ -24,9 +24,9 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: 'platform/package.json'
+          cache-dependency-path: 'platform/package-lock.json'
       - name: Instalar dependências
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Executar testes
         run: npm test
       - name: Verificar build de produção
