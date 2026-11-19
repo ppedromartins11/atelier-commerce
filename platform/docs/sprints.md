@@ -32,3 +32,19 @@ Não são usados produtos ou pedidos inventados. A foto do banner é um recurso 
 - Vitrine: https://atelier-commerce-platform.vercel.app/
 - Administração: https://atelier-commerce-platform.vercel.app/admin/login
 - Código: https://github.com/ppedromartins11/atelier-commerce/tree/main/platform
+
+### Sprint 2 — onboarding multi-loja (código desenvolvido)
+- [x] Registro de contas com confirmação de e-mail pelo Supabase Auth
+- [x] Cadastro de empresas como rascunho, com proprietário atribuído por trigger
+- [x] Seleção de loja ativa pelo lojista, com cookie somente de preferência e checagem de associação a cada ação
+- [x] Convites para administradores com e-mail verificado e validade de sete dias
+- [x] Acesso de administradores restrito à loja vinculada, com políticas de isolamento
+- [x] Vitrines isoladas em `/loja/[tenant]`, incluindo catálogo e carrinho com chaves distintas
+- [x] Solicitações de domínio sem DNS ou ativação automáticos
+- [x] Testes estáticos de isolamento e compilação automatizada
+- [ ] Provisionar banco Supabase exclusivo: a conta exige confirmação de custo, mesmo com estimativa de US$ 0/mês
+- [ ] Aplicar migrações, testar política RLS com usuários reais de lojas diferentes
+- [ ] Configurar e testar template de confirmação de e-mail e fluxo de convite
+- [ ] Homologar operações em uma instância de produção antes de vender
+
+**A plataforma ainda não está habilitada para lojas reais.** O código-fonte e telas não substituem o provisionamento e a homologação do banco de dados.
