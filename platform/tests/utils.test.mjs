@@ -2,23 +2,25 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const path=(f)=>new URL('../'+f,import.meta.url);
-test('rotas públicas e administração estão presentes',()=>{
-  for(const f of ['app/(store)/page.tsx','app/(store)/catalogo/page.tsx','app/(store)/produto/[slug]/page.tsx','app/(store)/carrinho/page.tsx','app/admin/login/page.tsx','app/admin/produtos/page.tsx','app/admin/estoque/page.tsx','lib/supabase.ts','app/api/health/route.ts']){
-    assert.ok(fs.existsSync(path(f)),f);
-  }
+const read=(f)=>fs.readFileSync(path(f),'utf8');
+test('all public and admin routes exist',()=>{
+ for(const f of [
+  'app/(store)/page.tsx','app/(store)/catalogo/page.tsx','app/(store)/produto/[slug]/page.tsx',
+  'app/(store)/carrinho/page.tsx','app/admin/login/page.tsx','app/admin/produtos/page.tsx',
+  'app/admin/estoque/page.tsx','app/api/health/route.ts','app/admin/lojas/page.tsx',
+  'app/admin/cadastro/page.tsx','app/loja/[tenant]/page.tsx'
+ ])assert.ok(fs.existsSync(path(f)),f);
 });
-test('nenhuma credencial de service-role no cliente público',()=>{
-  const source=fs.readFileSync(path('lib/supabase.ts'),'utf8');
-  assert.ok(!source.includes('SUPABASE_SERVICE_ROLE_KEY'));
+test('no server-only credential in browser code',()=>{
+ assert.ok(!read('lib/supabase.ts').includes('SUPABASE_SERVICE_ROLE_KEY'));
 });
-test('checkout não cobra enquanto o provedor não está configurado',()=>{
-  const cart=fs.readFileSync(path('app/(store)/carrinho/page.tsx'),'utf8');
-  assert.match(cart,/disabled>Finalização indisponível/);
+test('checkout cannot charge before a payment provider exists',()=>{
+ assert.match(read('components/cart-view.tsx'),/disabled>Finalização indisponível/);
 });
-test('operação de estoque usa RPC transacional',()=>{
-  const action=fs.readFileSync(path('app/admin/actions.ts'),'utf8');
-  const migration=fs.readFileSync(path('supabase/migrations/20261119180000_init_commerce.sql'),'utf8');
-  assert.match(action,/db\.rpc\('adjust_inventory'/);
-  assert.match(migration,/for update;/);
-  assert.match(migration,/stock_on_hand\+p_delta>=reserved/);
+test('inventory uses transactional RPC and prevents negative stock',()=>{
+ const action=read('app/admin/actions.ts');
+ const sql=read('supabase/migrations/20261119180000_init_commerce.sql');
+ assert.match(action,/db\.rpc\('adjust_inventory'/);
+ assert.match(sql,/for update;/);
+ assert.match(sql,/stock_on_hand\+p_delta>=reserved/);
 });
