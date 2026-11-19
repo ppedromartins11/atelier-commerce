@@ -68,6 +68,17 @@ create policy "invitations_owner_insert" on public.store_invitations
    and expires_at > now()
    and expires_at <= now() + interval '8 days'
  );
+-- Um convidado pode ler o nome da loja associada ao seu convite,
+-- sem ler catálogos privados ou os dados administrativos da empresa.
+create policy "stores_invitee_read" on public.stores
+ for select to authenticated using (
+   exists (
+     select 1 from public.store_invitations i
+     where i.store_id = id and i.accepted_at is null
+       and i.expires_at > now()
+       and i.email = lower(coalesce((select auth.jwt())->>'email',''))
+   )
+ );
 create policy "invitations_owner_delete" on public.store_invitations
  for delete to authenticated
  using ((select app_private.is_store_owner(store_id)) and accepted_at is null);
@@ -131,7 +142,7 @@ revoke all on function app_private.verify_store_membership() from public;
 create or replace function app_private.mark_invite_accepted()
 returns trigger language plpgsql security definer
 set search_path = ''
-as $
+as $$
 begin
  if new.role = 'admin' then
    update public.store_invitations
@@ -142,7 +153,7 @@ begin
  end if;
  return new;
 end
-$;
+$$;
 revoke all on function app_private.mark_invite_accepted() from public;
 create trigger mark_invitation_after_join
 after insert on public.store_members

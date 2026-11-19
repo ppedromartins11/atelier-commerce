@@ -1,7 +1,6 @@
 'use server';
 import {revalidatePath} from 'next/cache';
 import {redirect} from 'next/navigation';
-import {headers} from 'next/headers';
 import {memberStores,requireAdmin,selectStoreCookie,sessionClient} from '@/lib/supabase';
 import {slugify} from '@/lib/format';
 function field(data:FormData,key:string){return String(data.get(key)||'').trim();}
@@ -116,12 +115,15 @@ export async function removeTeamMember(data:FormData){
 }
 
 export async function changeStoreVisibility(data:FormData){
-  const context=await requireAdmin();
-  if(!context||context.role!=='owner')redirect('/admin/login');
+  const session=await memberStores();
+  if(!session)redirect('/admin/login');
+  const id=field(data,'store_id');
+  const selected=session.shops.find(shop=>shop.id===id&&shop.role==='owner');
+  if(!selected)problem('/admin/lojas','Você não é proprietário da loja solicitada.');
   const enabled=field(data,'visible')==='true';
-  const {error}=await context.db.from('stores').update({is_published:enabled}).eq('id',context.shop.id);
+  const {error}=await session.db.from('stores').update({is_published:enabled}).eq('id',selected.id);
   if(error)problem('/admin/lojas','Falha ao atualizar visibilidade da loja.');
   revalidatePath('/admin/lojas');
-  revalidatePath('/loja/'+context.shop.slug);
+  revalidatePath('/loja/'+selected.slug);
   redirect('/admin/lojas');
 }

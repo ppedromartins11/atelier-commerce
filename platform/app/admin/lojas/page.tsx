@@ -18,7 +18,7 @@ export default async function Stores({searchParams}:{searchParams:Promise<{erro?
      <div className="merchant-shop-head"><span className="eyebrow">SUA EMPRESA</span><span className={'status '+(shop.is_published?'':'off')}>{shop.is_published?'Vitrine visível':'Vitrine não publicada'}</span></div>
      <h2>{shop.name}</h2><p>/loja/{shop.slug}</p><p className="help-text">Permissão: {shop.role==='owner'?'Proprietário':'Administrador'}</p>
      <form action={changeActiveStore}><input name="store_id" type="hidden" value={shop.id}/><button className="btn btn-dark full" type="submit">Abrir administração ↗</button></form>
-     <div className="merchant-shop-actions"><Link href={'/loja/'+shop.slug} className="text-link">Visualizar loja ↗</Link>
+     <div className="merchant-shop-actions">{shop.is_published?<Link href={'/loja/'+shop.slug} className="text-link">Visualizar loja ↗</Link>:<span className="help-text">Vitrine indisponível até publicar</span>}
       {shop.role==='owner'&&<form action={changeStoreVisibility}><input type="hidden" name="store_id" value={shop.id}/><input type="hidden" name="visible" value={shop.is_published?'false':'true'}/><button className="text-link" type="submit">{shop.is_published?'Ocultar loja':'Publicar vitrine'}</button></form>}</div>
    </article>)}</div>
    <p className="help-text">Publicar uma vitrine não habilita pagamentos nem emissão fiscal. Esses recursos exigem integração e validação próprias.</p>
