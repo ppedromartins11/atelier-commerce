@@ -74,7 +74,7 @@ create policy "stores_invitee_read" on public.stores
  for select to authenticated using (
    exists (
      select 1 from public.store_invitations i
-     where i.store_id = id and i.accepted_at is null
+     where i.store_id = public.stores.id and i.accepted_at is null
        and i.expires_at > now()
        and i.email = lower(coalesce((select auth.jwt())->>'email',''))
    )

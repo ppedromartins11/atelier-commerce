@@ -127,3 +127,30 @@ export async function changeStoreVisibility(data:FormData){
   revalidatePath('/loja/'+selected.slug);
   redirect('/admin/lojas');
 }
+
+export async function proposeStoreDomain(data:FormData){
+  const context=await requireAdmin();
+  if(!context)redirect('/admin/login');
+  if(context.role!=='owner')problem('/admin/dominios','Somente o proprietário pode configurar domínios.');
+  const host=field(data,'hostname').toLowerCase().replace(/^https?:\/\//,'').replace(/\/$/,'');
+  if(host.length<4||host.length>253||host.startsWith('-')||host.endsWith('-')
+     || !/^[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?)+$/.test(host)
+     || ['vercel.app','supabase.co','myshopify.com'].some(d=>host===d||host.endsWith('.'+d)))
+    problem('/admin/dominios','Informe somente um domínio válido sob seu controle.');
+  const {error}=await context.db.from('store_domains').insert({
+    store_id:context.shop.id,hostname:host
+  });
+  if(error)problem('/admin/dominios','Não foi possível registrar o domínio. Verifique se já está cadastrado.');
+  revalidatePath('/admin/dominios');
+  redirect('/admin/dominios?registrado=1');
+}
+export async function removePendingDomain(data:FormData){
+  const context=await requireAdmin();
+  if(!context||context.role!=='owner')redirect('/admin/login');
+  const id=field(data,'domain_id');
+  const {error}=await context.db.from('store_domains').delete()
+    .eq('id',id).eq('store_id',context.shop.id).is('verified_at',null);
+  if(error)problem('/admin/dominios','Não foi possível remover este domínio.');
+  revalidatePath('/admin/dominios');
+  redirect('/admin/dominios');
+}

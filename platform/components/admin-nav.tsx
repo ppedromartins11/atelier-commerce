@@ -13,6 +13,7 @@ export default async function AdminNav({children}:{children:React.ReactNode}) {
       <Link href="/admin/pedidos">Pedidos</Link>
       <Link href="/admin/fiscal">Notas fiscais</Link>
       <Link href="/admin/configuracoes">Configurações</Link>
+      {context?.role==='owner'&&<Link href="/admin/dominios">Domínios</Link>}
       {context?.role==='owner'&&<Link href="/admin/equipe">Equipe e convites</Link>}
       <div className="admin-sidebar-divider"/>
       <Link href="/admin/lojas">Trocar de loja</Link>
