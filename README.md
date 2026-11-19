@@ -2,6 +2,12 @@
 
 **Tema original e reutilizável** para lojas virtuais de tênis, roupas, acessórios e outros segmentos. Desenvolvido com **Liquid, HTML, CSS e JavaScript**, usando o catálogo, carrinho e checkout nativos da Shopify. O projeto usa **Xo Gang Brazil apenas como referência funcional**, sem copiar identidade visual, código privado ou conteúdos da marca.
 
+## Prévia visual publicada
+
+A prévia estática do layout está hospedada na Vercel: **https://atelier-commerce-iota.vercel.app/**.
+
+A Vercel publica apenas a pasta [`preview/`](preview/) deste repositório. O tema Shopify completo permanece nas pastas `sections/`, `templates/`, `layout/`, `snippets/`, `config/` e `assets/`. **A prévia não processa pedidos, não contém produtos cadastrados e não possui checkout funcional.** Para ativar vendas, é necessário instalar este tema em uma loja Shopify autorizada, configurar catálogo, frete e pagamentos e homologar os fluxos comerciais.
+
 ## O que já foi desenvolvido
 
 - Homepage com banner configurável, seções de categorias, coleção em destaque, apresentação de marca e newsletter.
