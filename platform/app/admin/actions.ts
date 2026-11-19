@@ -1,7 +1,7 @@
 'use server';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { requireAdmin, sessionClient } from '@/lib/supabase';
+import { requireAdmin, sessionClient, clearStoreCookie } from '@/lib/supabase';
 import { slugify, priceToCents, nonNegativeInt } from '@/lib/format';
 function read(form:FormData,key:string){return String(form.get(key)||'').trim();}
 function fail(message:string, destination='/admin/produtos'):never{redirect(destination+'?erro='+encodeURIComponent(message));}
@@ -18,11 +18,12 @@ export async function signIn(form:FormData){
   if(!email||!password) redirect('/admin/login?erro=dados');
   const { error }=await db.auth.signInWithPassword({email,password});
   if(error) redirect('/admin/login?erro=credenciais');
-  redirect('/admin');
+  redirect('/admin/lojas');
 }
 export async function signOut(){
   const db=await sessionClient();
   if(db)await db.auth.signOut();
+  await clearStoreCookie();
   redirect('/admin/login');
 }
 export async function createCategory(form:FormData){
