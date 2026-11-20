@@ -13,6 +13,9 @@ const input=(form:FormData,name:string)=>String(form.get(name)||'').trim();
 function fail(id:string,message:string):never {
  redirect('/admin/produtos/'+encodeURIComponent(id)+'?erro='+encodeURIComponent(message));
 }
+function importFail(message:string):never {
+ redirect('/admin/produtos?erro='+encodeURIComponent(message));
+}
 function refresh(slug:string) {
  revalidatePath('/admin/produtos');
  revalidatePath('/admin/estoque');
@@ -189,15 +192,14 @@ export async function removeProductImage(form:FormData) {
 export async function importCatalogCsv(form:FormData) {
  const a=await context();
  const file=form.get('file');
- const invalid=(message:string):never=>redirect('/admin/produtos?erro='+encodeURIComponent(message));
  if(!(file instanceof File)||!file.size||file.size>100000)
-  invalid('Selecione um CSV de até 100 KB.');
+  importFail('Selecione um CSV de até 100 KB.');
  let rows:ReturnType<typeof parseCatalogCsv>;
  try{rows=parseCatalogCsv(await file.text());}
- catch(e){invalid((e as Error).message);}
+ catch(e){importFail((e as Error).message);}
  const {data:categories,error:catError}=await a.db.from('categories')
    .select('id,slug').eq('store_id',a.shop.id);
- if(catError)invalid('Falha ao consultar as categorias.');
+ if(catError)importFail('Falha ao consultar as categorias.');
  const categoryBySlug=new Map((categories||[]).map(c=>[c.slug,c.id]));
  const slugs=new Set<string>();
  const skus=new Set<string>();
@@ -208,25 +210,25 @@ export async function importCatalogCsv(form:FormData) {
   const slug=slugify(title);
   if(title.length<3||title.length>180||slug.length<3||slug.length>180
      ||sku.length<2||sku.length>80||row.description.length>5000)
-   invalid('Dados inválidos na linha '+(i+2)+'.');
+   importFail('Dados inválidos na linha '+(i+2)+'.');
   if(slugs.has(slug)||skus.has(sku.toLowerCase()))
-   invalid('Há nomes ou SKUs repetidos no CSV (linha '+(i+2)+').');
+   importFail('Há nomes ou SKUs repetidos no CSV (linha '+(i+2)+').');
   slugs.add(slug);skus.add(sku.toLowerCase());
   let price_cents:number,stock:number;
   try {price_cents=priceToCents(row.price);stock=nonNegativeInt(row.stock,'Estoque');}
-  catch {invalid('Preço ou estoque inválido na linha '+(i+2)+'.');}
-  if(stock>500000)invalid('Estoque acima do limite na linha '+(i+2)+'.');
+  catch {importFail('Preço ou estoque inválido na linha '+(i+2)+'.');}
+  if(stock>500000)importFail('Estoque acima do limite na linha '+(i+2)+'.');
   const category_slug=slugify(row.category_slug);
   const category_id=category_slug?categoryBySlug.get(category_slug):null;
   if(category_slug&&!category_id)
-   invalid('Categoria não encontrada na linha '+(i+2)+': '+row.category_slug);
+   importFail('Categoria não encontrada na linha '+(i+2)+': '+row.category_slug);
   payload.push({title,slug,sku,price_cents,stock,description:row.description,category_id:category_id||null});
  }
  const {error,count}=await (async()=>{
   const response=await a.db.rpc('import_catalog_batch',{p_store_id:a.shop.id,p_rows:payload});
   return {error:response.error,count:response.data};
  })();
- if(error)invalid('Importação cancelada sem alterações. Confira SKUs, nomes e categorias duplicados.');
+ if(error)importFail('Importação cancelada sem alterações. Confira SKUs, nomes e categorias duplicados.');
  refresh(a.shop.slug);
  redirect('/admin/produtos?importados='+String(count||payload.length));
 }
