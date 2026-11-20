@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read=(path)=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
-const migration=read('supabase/migrations/20261120012500_catalog_lifecycle_and_private_images.sql');
-const imageMigration=read('supabase/migrations/20261120012700_catalog_image_mutation_rpc.sql');
+const migration=read('supabase/migrations/20261120021324_catalog_lifecycle_and_private_images.sql');
+const imageMigration=read('supabase/migrations/20261120021414_catalog_image_mutation_rpc.sql');
 
 test('product archiving preserves data and excludes archived products from anonymous listings',()=>{
  assert.match(migration,/add column if not exists archived_at/);

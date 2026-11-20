@@ -31,7 +31,7 @@ test('inventory summary aggregates only the supplied SKU selection',()=>{
 });
 
 test('audit counts are accessible only via checked private RPC and not direct grants',()=>{
- const migration=read('supabase/migrations/20261120030000_inventory_counts_reorder_rpc.sql');
+ const migration=read('supabase/migrations/20261120025251_inventory_counts_reorder_rpc.sql');
  assert.match(migration,/alter table public\.inventory_counts enable row level security/);
  assert.match(migration,/grant select on public\.inventory_counts to authenticated/);
  assert.match(migration,/revoke insert,update,delete,truncate,trigger,references\s+on public\.inventory_counts/);

@@ -26,7 +26,7 @@ test('CSV import parser rejects invalid headers, unfinished quote, and over-limi
 });
 
 test('CSV import uses one database transaction and enforces store membership',()=>{
- const sql=read('supabase/migrations/20261120013500_atomic_catalog_csv_import.sql');
+ const sql=read('supabase/migrations/20261120022145_atomic_catalog_csv_import.sql');
  const actions=read('app/admin/catalog-actions.ts');
  assert.match(sql,/jsonb_array_length\(p_rows\) not between 1 and 100/);
  assert.match(sql,/not public\.is_store_admin\(p_store_id\)/);

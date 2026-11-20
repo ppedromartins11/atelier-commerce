@@ -21,8 +21,8 @@ Implementação na branch `sprint-4-inventory`, sobre `sprint-3-3-catalog`. PR #
 - `inventory_counts` não possui grants de INSERT, UPDATE, DELETE ou TRUNCATE para os papéis `anon` e `authenticated`.
 
 ## Migrações
-- `platform/supabase/migrations/20261120030000_inventory_counts_reorder_rpc.sql` aplicada via conector à instância exclusiva; versão remota `20261120025251`.
-- **Não executar `supabase db push` até reconciliar o histórico remoto (múltiplos timestamps remotos diferem dos arquivos da branch).** O restante das 9 migrações já estava aplicado. Não reexecutar migrações antigas manualmente.
+- `platform/supabase/migrations/20261120025251_inventory_counts_reorder_rpc.sql` aplicada via conector à instância exclusiva; versão remota `20261120025251`.
+- **Nota da homologação 4.1:** os arquivos agora seguem as versões remotas no branch de QA. Não executar `supabase db push` sem uma verificação independente do plano de migrações. O restante das 9 migrações já estava aplicado. Não reexecutar migrações antigas manualmente.
 
 ## Pendências para homologação comercial
 1. Testar a interface do inventário no browser: contagem, ajuste, filtros, navegação mobile, erros e confirmação após atualização.

@@ -16,12 +16,12 @@ Implementação em branch `sprint-3-3-catalog`, sobre `sprint-3-supabase-hardeni
 
 ## Migrações aplicadas no banco de desenvolvimento
 
-- `catalog_lifecycle_and_private_images`, versão remota `20261120021324` (arquivo `20261120012500_catalog_lifecycle_and_private_images.sql`)
-- `catalog_image_mutation_rpc`, versão remota `20261120021414` (arquivo `20261120012700_catalog_image_mutation_rpc.sql`)
-- `fix_catalog_reparent_trigger`, versão remota `20261120021938` (arquivo `20261120013000_fix_catalog_reparent_trigger.sql`)
-- `atomic_catalog_csv_import`, versão remota `20261120022145` (arquivo `20261120013500_atomic_catalog_csv_import.sql`)
+- `catalog_lifecycle_and_private_images`, versão remota `20261120021324` (arquivo `20261120021324_catalog_lifecycle_and_private_images.sql`)
+- `catalog_image_mutation_rpc`, versão remota `20261120021414` (arquivo `20261120021414_catalog_image_mutation_rpc.sql`)
+- `fix_catalog_reparent_trigger`, versão remota `20261120021938` (arquivo `20261120021938_fix_catalog_reparent_trigger.sql`)
+- `atomic_catalog_csv_import`, versão remota `20261120022145` (arquivo `20261120022145_atomic_catalog_csv_import.sql`)
 
-As 5 migrações remotas anteriores também continuam registradas. **IMPORTANTE:** o conector registra versões de aplicação diferentes dos timestamps de alguns arquivos do GitHub. Reconciliar cuidadosamente antes de executar `supabase db push`, `migration repair` ou automação de migrações.
+As 5 migrações remotas anteriores também continuam registradas. **Nota de homologação 4.1:** os nomes dos arquivos foram alinhados às versões registradas no Supabase, somente na branch de QA. Ainda é necessário validar o plano de migrações com CLI antes de fazer qualquer operação de push.
 
 ## Validação
 
