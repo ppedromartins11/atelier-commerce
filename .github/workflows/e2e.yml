@@ -1,0 +1,67 @@
+name: Homologação E2E real (QA)
+
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: 'Teste público ou homologação completa com duas contas reais'
+        required: true
+        type: choice
+        options:
+          - public
+          - full
+        default: public
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: platform
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.QA_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.QA_SUPABASE_PUBLISHABLE_KEY }}
+      QA_PRIVATE_STORE_SLUG: ${{ vars.QA_PRIVATE_STORE_SLUG }}
+      QA_PRIVATE_STORE_ID: ${{ vars.QA_PRIVATE_STORE_ID }}
+      STORE_SLUG: atelier
+    steps:
+      - name: Obter a versão sob teste
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: platform/package-lock.json
+      - name: Confirmar credenciais públicas de QA
+        run: |
+          test -n "$NEXT_PUBLIC_SUPABASE_URL" || { echo "Configure QA_SUPABASE_URL em Actions secrets"; exit 1; }
+          test -n "$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" || { echo "Configure QA_SUPABASE_PUBLISHABLE_KEY em Actions secrets"; exit 1; }
+          test "$NEXT_PUBLIC_SUPABASE_URL" = "https://pnfixgdfnzphrygtfmsd.supabase.co" || { echo "Projeto diferente do banco QA autorizado"; exit 1; }
+      - name: Instalar dependências
+        run: npm ci
+      - name: Instalar Chromium para E2E
+        run: npx playwright install --with-deps chromium
+      - name: Verificar build
+        run: npm run build
+      - name: Testar rotas e Data API públicas
+        run: npm run test:e2e:public
+      - name: Validar autorização para testes com escrita
+        if: inputs.scope == 'full'
+        env:
+          QA_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.QA_SUPABASE_SERVICE_ROLE_KEY }}
+          QA_E2E_EMAIL_DOMAIN: ${{ vars.QA_E2E_EMAIL_DOMAIN }}
+        run: |
+          test -n "$QA_SUPABASE_SERVICE_ROLE_KEY" || { echo "Secret QA_SUPABASE_SERVICE_ROLE_KEY ausente"; exit 1; }
+          test -n "$QA_E2E_EMAIL_DOMAIN" || { echo "QA_E2E_EMAIL_DOMAIN ausente"; exit 1; }
+      - name: Executar jornada real com duas contas e limpeza
+        if: inputs.scope == 'full'
+        env:
+          QA_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.QA_SUPABASE_SERVICE_ROLE_KEY }}
+          QA_E2E_EMAIL_DOMAIN: ${{ vars.QA_E2E_EMAIL_DOMAIN }}
+          QA_E2E_ALLOW_MUTATIONS: enabled
+        run: npx playwright test tests/e2e/authenticated.spec.mjs
