@@ -31,3 +31,5 @@ jobs:
         run: npm test
       - name: Verificar build de produção
         run: npm run build
+      - name: Homologar rotas e interface em Chromium
+        run: node tests/browser-smoke.mjs
