@@ -91,3 +91,16 @@
 .store-footer-top{flex-direction:column;gap:25px}
 .store-footer-links{gap:14px 25px}
 }
+
+/* Sprint 3.3 — edição responsiva de catálogo */
+.variant-editor{padding:22px 0;border-top:1px solid var(--stroke);margin-top:15px}
+.variant-editor h3{font-size:17px;margin:0}
+.product-media-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:16px;margin:24px 0}
+.product-media{min-width:0;display:grid;gap:10px}
+.product-media img{width:100%;aspect-ratio:4/5;object-fit:cover;background:#eff0ec;border:1px solid var(--stroke)}
+.product-row-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.category-manage{display:grid;gap:12px}
+.category-manage-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--stroke);padding-bottom:12px}
+.category-manage-edit{display:flex;align-items:center;gap:12px;flex:1;min-width:210px}
+.category-manage-edit input{min-width:0;max-width:320px}
+@media(max-width:620px){.category-manage-row{align-items:stretch;flex-direction:column}.category-manage-edit{min-width:0}.variant-editor{padding:18px 0}.product-media-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
