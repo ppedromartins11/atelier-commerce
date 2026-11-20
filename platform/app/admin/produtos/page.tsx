@@ -4,9 +4,9 @@ import AdminNav from '@/components/admin-nav';
 import {requireAdmin} from '@/lib/supabase';
 import {money} from '@/lib/format';
 import {createCategory,createProduct,toggleProduct} from '@/app/admin/actions';
-import {saveCategoryName,removeEmptyCategory} from '@/app/admin/catalog-actions';
+import {saveCategoryName,removeEmptyCategory,importCatalogCsv} from '@/app/admin/catalog-actions';
 export const dynamic='force-dynamic';
-export default async function Products({searchParams}:{searchParams:Promise<{erro?:string;salvo?:string}>}){
+export default async function Products({searchParams}:{searchParams:Promise<{erro?:string;salvo?:string;importados?:string}>}){
  const a=await requireAdmin();if(!a)redirect('/admin/login');
  const [prod,cats]=await Promise.all([
    a.db.from('products').select('id,title,slug,price_cents,active,archived_at,product_variants(sku,stock_on_hand,reserved)').eq('store_id',a.shop.id).order('created_at',{ascending:false}).limit(100),
@@ -17,6 +17,7 @@ export default async function Products({searchParams}:{searchParams:Promise<{err
  <div className="admin-title"><div><span className="eyebrow">CATÁLOGO</span><h1>Produtos</h1><p>Crie e organize produtos reais por loja. Depois, edite imagens, SKUs e variações.</p></div></div>
  {params.erro&&<p className="alert" role="alert">{params.erro}</p>}
  {params.salvo&&<p className="notice" role="status">Cadastro atualizado.</p>}
+ {params.importados&&<p className="notice" role="status">{params.importados} produtos importados como rascunho.</p>}
  {prod.error&&<p className="alert" role="alert">Falha ao consultar produtos. Verifique a conexão e tente novamente.</p>}
  {cats.error&&<p className="alert" role="alert">Falha ao consultar categorias. Verifique a conexão e tente novamente.</p>}
  <div className="panel"><h2>Cadastrar produto</h2><p>O novo produto pode iniciar como rascunho. Depois do cadastro, abra Editar para enviar imagens e adicionar SKUs.</p>
@@ -36,6 +37,14 @@ export default async function Products({searchParams}:{searchParams:Promise<{err
    <form action={saveCategoryName} className="category-manage-edit"><input type="hidden" name="category_id" value={c.id}/><input name="name" defaultValue={c.name} required minLength={2} maxLength={100} aria-label={'Nome da categoria '+c.name}/><button type="submit" className="text-link">Renomear</button></form>
    <form action={removeEmptyCategory}><input type="hidden" name="category_id" value={c.id}/><button type="submit" className="text-link danger">Excluir vazia</button></form>
   </div>)}</div>:<p>Nenhuma categoria cadastrada.</p>)}
+ </div>
+ <div className="panel"><h2>Importar catálogo CSV</h2>
+  <p>Importe até 100 produtos por vez, sempre como rascunhos. O arquivo deve usar ponto e vírgula como separador e ter as colunas do modelo. Se alguma linha falhar, nenhum produto será gravado.</p>
+  <p><Link className="text-link" href="/modelo-importacao-catalogo.csv" download>Baixar modelo CSV vazio</Link></p>
+  <form action={importCatalogCsv} className="field-grid">
+   <label className="field wide">Arquivo CSV<input type="file" name="file" accept=".csv,text/csv" required/></label>
+   <div className="wide"><button className="btn btn-dark" type="submit">Importar produtos</button></div>
+  </form>
  </div>
  <div className="panel"><h2>Produtos cadastrados</h2>
  {!prod.error&&<><div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Nome / SKU</th><th>Preço</th><th>Estoque</th><th>Status</th><th>Ações</th></tr></thead><tbody>{(prod.data||[]).map(p=><tr key={p.id}><td><strong>{p.title}</strong><br/><span className="muted">{p.product_variants?.map(v=>v.sku).join(', ')||'—'}</span></td><td>{money(p.price_cents)}</td><td>{p.product_variants?.reduce((s,v)=>s+v.stock_on_hand-v.reserved,0)||0}</td><td><span className={'status '+(p.active&&!p.archived_at?'':'off')}>{p.archived_at?'Arquivado':p.active?'Publicado':'Rascunho'}</span></td><td><div className="product-row-actions"><Link href={'/admin/produtos/'+p.id} className="text-link">Editar</Link>{!p.archived_at&&<form action={toggleProduct}><input type="hidden" name="id" value={p.id}/><input type="hidden" name="active" value={p.active?'false':'true'}/><button type="submit" className="text-link">{p.active?'Despublicar':'Publicar'}</button></form>}</div></td></tr>)}</tbody></table></div>{!prod.data?.length&&<p>Nenhum produto cadastrado ainda.</p>}</>}
