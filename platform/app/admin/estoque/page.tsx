@@ -4,6 +4,7 @@ import AdminNav from '@/components/admin-nav';
 import {requireAdmin} from '@/lib/supabase';
 import {adjustStock} from '@/app/admin/actions';
 import {reconcilePhysicalCount,setReorderPoint} from '@/app/admin/inventory-actions';
+import {availableInventory,inventoryState,inventorySummary} from '@/lib/inventory';
 
 export const dynamic='force-dynamic';
 type Filter='todos'|'baixo'|'esgotado';
@@ -30,11 +31,9 @@ export default async function Inventory({searchParams}:{
    .eq('store_id',a.shop.id).order('created_at',{ascending:false}).limit(20)
  ]);
  const items=variants.data||[];
- const available=(v:{stock_on_hand:number;reserved:number})=>v.stock_on_hand-v.reserved;
- const out=items.filter(v=>available(v)===0).length;
- const low=items.filter(v=>available(v)>0&&v.reorder_point>0&&available(v)<=v.reorder_point).length;
- const visible=items.filter(v=>filter==='esgotado'?available(v)===0
-     :filter==='baixo'?available(v)>0&&v.reorder_point>0&&available(v)<=v.reorder_point:true);
+ const {out,low}=inventorySummary(items);
+ const visible=items.filter(v=>filter==='esgotado'?inventoryState(v)==='out'
+     :filter==='baixo'?inventoryState(v)==='low':true);
  const filterHref=(name:Filter)=>'/admin/estoque?filtro='+name+(search?'&busca='+encodeURIComponent(search):'');
  return <AdminNav>
   <div className="admin-title">
@@ -75,8 +74,9 @@ export default async function Inventory({searchParams}:{
       <th>Produto / SKU</th><th>Físico</th><th>Reservado</th><th>Disponível</th><th>Alerta</th><th>Operações</th>
      </tr></thead><tbody>
      {visible.map(v=>{
-      const qty=available(v);
-      const status=qty===0?'Esgotado':v.reorder_point>0&&qty<=v.reorder_point?'Estoque baixo':'Normal';
+      const qty=availableInventory(v);
+      const state=inventoryState(v);
+      const status=state==='out'?'Esgotado':state==='low'?'Estoque baixo':'Normal';
       return <tr key={v.id}>
        <td><strong>{v.products?.[0]?.title||'Produto'}</strong><br/><span className="muted">{v.label} / {v.sku}</span>
         {v.products?.[0]?.archived_at&&<small className="muted"> · Arquivado</small>}
