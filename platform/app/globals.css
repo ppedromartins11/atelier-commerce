@@ -104,3 +104,23 @@
 .category-manage-edit{display:flex;align-items:center;gap:12px;flex:1;min-width:210px}
 .category-manage-edit input{min-width:0;max-width:320px}
 @media(max-width:620px){.category-manage-row{align-items:stretch;flex-direction:column}.category-manage-edit{min-width:0}.variant-editor{padding:18px 0}.product-media-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Sprint 4 — inventory dashboard: compact controls with responsive table overflow */
+.inventory-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.inventory-toolbar{display:flex;align-items:end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:25px}
+.inventory-search{display:flex;align-items:end;gap:8px;flex-wrap:wrap;flex:1}
+.inventory-search label{font-size:12px;font-weight:700}
+.inventory-search input{max-width:230px;min-width:160px}
+.inventory-filters{display:flex;gap:8px;flex-wrap:wrap}
+.inventory-filters a{display:inline-flex;padding:8px 12px;border:1px solid var(--stroke);font-size:12px;font-weight:700;background:#fff}
+.inventory-filters a[aria-current=page]{background:#232723;color:#fff}
+.inventory-operations{min-width:260px;max-width:320px;display:grid;gap:10px}
+.inventory-reorder{display:flex;gap:10px;align-items:end;justify-content:space-between}
+.inventory-reorder label{font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px}
+.inventory-reorder input{width:86px;min-height:38px;padding:7px 9px}
+.inventory-operations summary{font-size:12px;font-weight:700;cursor:pointer;padding:8px 0}
+.inventory-drawer{display:grid;gap:10px;background:#f7f7f4;padding:12px}
+.inventory-drawer label{display:grid;gap:5px;font-size:11px;font-weight:700}
+.inventory-drawer input{min-height:40px}
+.inventory-drawer .btn{padding:10px;min-height:40px}
+@media(max-width:700px){.inventory-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.inventory-toolbar{align-items:stretch;flex-direction:column}.inventory-search input{max-width:none;flex:1}}
