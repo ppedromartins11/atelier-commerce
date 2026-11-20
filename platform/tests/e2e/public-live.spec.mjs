@@ -74,3 +74,19 @@ test('Supabase Auth e Data API públicos respondem sem expor dados privados',asy
     } else expect([400,401,403]).toContain(list.status());
   }
 });
+
+test('login inválido recebe feedback sem autenticar e cadastro respeita validação',async({page})=>{
+ test.skip(!url||!key,'Requer conexão com Supabase de desenvolvimento.');
+ await page.goto('/admin/login');
+ await page.locator('input[name=email]').fill('qa-inexistente@atelier.invalid');
+ await page.locator('input[name=password]').fill('senha-que-nao-existe-123');
+ await page.getByRole('button',{name:'Entrar no painel'}).click();
+ await expect(page).toHaveURL(/\/admin\/login\?erro=/);
+ await expect(page.getByText('Não foi possível autenticar.')).toBeVisible();
+ await page.goto('/admin/cadastro');
+ await page.locator('input[name=email]').fill('endereco-invalido');
+ await page.locator('input[name=password]').fill('senha-com-mais-de-12-caracteres');
+ await page.getByRole('button',{name:'Criar minha conta'}).click();
+ expect(await page.locator('input[name=email]').evaluate(el=>el.validity.typeMismatch)).toBe(true);
+ await expect(page).toHaveURL(/\/admin\/cadastro(?:\?|$)/);
+});
