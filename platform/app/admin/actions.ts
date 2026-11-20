@@ -71,7 +71,7 @@ export async function toggleProduct(form:FormData){
   const {db,shop}=await access();
   const id=read(form,'id');
   const active=read(form,'active')==='true';
-  const {error}=await db.from('products').update({active}).eq('id',id).eq('store_id',shop.id);
+  const {error}=await db.from('products').update({active}).eq('id',id).eq('store_id',shop.id).is('archived_at',null);
   if(error)fail('Não foi possível alterar o produto: '+error.message);
   revalidatePath('/');
   revalidatePath('/catalogo');
