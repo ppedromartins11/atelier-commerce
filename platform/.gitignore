@@ -4,3 +4,9 @@ node_modules/
 .env.local
 *.tsbuildinfo
 supabase/.temp/
+
+# Never commit QA secrets, credentials or browser artifacts.
+.qa-credentials.json
+.qa-runtime.json
+test-results/
+playwright-report/
