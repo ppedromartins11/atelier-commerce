@@ -86,7 +86,7 @@ export default async function EditProduct({
      </form>
     </div>)}
    </div>
-   {!p.archived_at&&(p.images||[]).length<8&&<form action={uploadProductImage} encType="multipart/form-data" className="field-grid">
+   {!p.archived_at&&(p.images||[]).length<8&&<form action={uploadProductImage} className="field-grid">
     <input type="hidden" name="product_id" value={p.id}/>
     <label className="field wide">Enviar imagem<input type="file" name="file" accept="image/jpeg,image/png,image/webp" required/></label>
     <div className="wide"><button type="submit" className="btn btn-dark">Adicionar imagem</button></div>
