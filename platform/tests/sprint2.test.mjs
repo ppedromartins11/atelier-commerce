@@ -23,7 +23,7 @@ test('store choice never trusts the cookie as authorization',()=>{
  assert.match(read('app/admin/onboarding-actions.ts'),/session.shops.find\(shop=>shop.id===id&&shop.role==='owner'\)/);
 });
 test('onboarding migration has row security, verified invite and safe trigger quoting',()=>{
- const sql=read('supabase/migrations/20261119214000_multi_tenant_onboarding.sql');
+ const sql=read('supabase/migrations/20261119231712_multi_tenant_onboarding.sql');
  assert.match(sql,/enable row level security/);
  assert.match(sql,/stores_register_own/);
  assert.match(sql,/email_confirmed_at is not null/);
@@ -33,7 +33,7 @@ test('onboarding migration has row security, verified invite and safe trigger qu
  assert.doesNotMatch(sql,/as \$\n/);
 });
 test('no public order creation or fiscal issue endpoints',()=>{
- const sql=read('supabase/migrations/20261119180000_init_commerce.sql');
+ const sql=read('supabase/migrations/20261119231706_init_commerce.sql');
  assert.doesNotMatch(sql,/create policy [^\n]+ on public\.orders for insert/i);
  assert.doesNotMatch(sql,/create policy [^\n]+ on public\.fiscal_documents for insert/i);
 });

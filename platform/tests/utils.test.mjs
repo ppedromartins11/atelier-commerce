@@ -19,7 +19,7 @@ test('checkout cannot charge before a payment provider exists',()=>{
 });
 test('inventory uses transactional RPC and prevents negative stock',()=>{
  const action=read('app/admin/actions.ts');
- const sql=read('supabase/migrations/20261119180000_init_commerce.sql');
+ const sql=read('supabase/migrations/20261119231706_init_commerce.sql');
  assert.match(action,/db\.rpc\('adjust_inventory'/);
  assert.match(sql,/for update;/);
  assert.match(sql,/stock_on_hand\+p_delta>=reserved/);

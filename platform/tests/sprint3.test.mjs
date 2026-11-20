@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 
 const read=(file)=>readFileSync(new URL('../'+file,import.meta.url),'utf8');
-const migration='supabase/migrations/20261119224437_secure_store_updates_and_atomic_product_creation.sql';
+const migration='supabase/migrations/20261119231718_secure_store_updates_and_atomic_product_creation.sql';
 
 test('tenant categories resolve the tenant passed by the public route',()=>{
   const source=read('lib/catalog.ts');
