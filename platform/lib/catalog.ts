@@ -8,7 +8,7 @@ export async function catalog(search?: string, category?: string, tenantSlug?: s
   const shop = await store(tenantSlug);
   const db = publicClient();
   if (!shop || !db) return { shop, products: [] as Item[] };
-  let query = db.from('products').select('id,slug,title,description,price_cents,compare_at_cents,images,product_variants(id,sku,label,stock_on_hand,reserved,active)').eq('store_id', shop.id).eq('active', true).order('created_at', { ascending: false }).limit(100);
+  let query = db.from('products').select('id,slug,title,description,price_cents,compare_at_cents,images,product_variants(id,sku,label,stock_on_hand,reserved,active)').eq('store_id', shop.id).eq('active', true).is('archived_at',null).order('created_at', { ascending: false }).limit(100);
   if (search?.trim()) query = query.ilike('title', '%' + search.trim().replace(/[%_,]/g, '') + '%');
   if (category) query = query.eq('category_id', category);
   const { data, error } = await query;
